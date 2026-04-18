@@ -1,15 +1,17 @@
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class GameFrame extends JFrame {
 
     public GameFrame() {
-        setTitle("Pacman Game");
-        setSize(800, 800);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Pac-Man Game");
+
+        GamePanel panel = new GamePanel();
+        add(panel);
+
+        pack(); // auto size
         setLocationRelativeTo(null);
-
-        add(new GamePanel());
-
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
         setVisible(true);
     }
 }

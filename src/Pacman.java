@@ -5,6 +5,7 @@ public class Pacman {
     int x, y;
     int size = 30;
     int speed = 5;
+
     int dx = 0, dy = 0;
     int score = 0;
 
@@ -22,54 +23,41 @@ public class Pacman {
         int newX = x + dx * speed;
         int newY = y + dy * speed;
 
-        if (!maze.isWall(newX, newY, size)) {
+        // 4-corner collision check
+        if (!maze.isWall(newX, newY) &&
+                !maze.isWall(newX + size - 1, newY) &&
+                !maze.isWall(newX, newY + size - 1) &&
+                !maze.isWall(newX + size - 1, newY + size - 1)) {
+
             x = newX;
             y = newY;
+        }
 
-            if (maze.eatFood(x, y)) {
-                score += 10;
-            }
+        if (maze.eatFood(x, y)) {
+            score += 10;
         }
     }
 
     public void draw(Graphics g) {
+        g.setColor(Color.RED);
 
-        Graphics2D g2 = (Graphics2D) g;
+        int startAngle = getMouthAngle();
+        int arcAngle = 300; // mouth opening size
 
-        g2.setColor(Color.RED);
+        g.fillArc(x, y, size, size, startAngle, arcAngle);
 
-        int startAngle = 30;
+        g.setColor(Color.BLACK);
+        g.fillOval(x + 20, y + 5, 5, 5);
+    }
 
-        if (dx == 1) startAngle = 30;        // RIGHT
-        else if (dx == -1) startAngle = 210; // LEFT
-        else if (dy == -1) startAngle = 120; // UP
-        else if (dy == 1) startAngle = 300;  // DOWN
+    // ✅ NEW: direction-based mouth rotation
+    private int getMouthAngle() {
+        if (dx == 1) return 30;    // right
+        if (dx == -1) return 210;  // left
+        if (dy == -1) return 120;  // up
+        if (dy == 1) return 300;   // down
 
-        // Draw body (mouth)
-        g2.fillArc(x, y, size, size, startAngle, 300);
-        g2.setColor(Color.BLACK);
-
-        int eyeX = x + size / 2;
-        int eyeY = y + size / 2;
-
-        if (dx == 1) { // RIGHT
-            eyeX = x + (int)(size * 0.65);
-            eyeY = y + (int)(size * 0.25);
-        }
-        else if (dx == -1) { // LEFT
-            eyeX = x + (int)(size * 0.25);
-            eyeY = y + (int)(size * 0.25);
-        }
-        else if (dy == -1) { // UP
-            eyeX = x + (int)(size * 0.30);
-            eyeY = y + (int)(size * 0.25);
-        }
-        else if (dy == 1) { // DOWN
-            eyeX = x + (int)(size * 0.30);
-            eyeY = y + (int)(size * 0.65);
-        }
-
-        g2.fillOval(eyeX, eyeY, size / 6, size / 6);
+        return 30; // default (right)
     }
 
     public Rectangle getBounds() {

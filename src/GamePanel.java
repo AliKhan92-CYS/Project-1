@@ -10,11 +10,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     Maze maze;
 
     Ghost[] ghosts;
-    int ghostCount = 1;
+    int ghostCount = 0;
 
     boolean up, down, left, right;
 
-    int spawnTimer = 0;   // controls delay
+    int spawnTimer = 0;
     Random rand = new Random();
 
     public GamePanel() {
@@ -24,21 +24,26 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         pacman = new Pacman(50, 50);
         maze = new Maze();
 
-        ghosts = new Ghost[10];
+        // ✅ FIX 1: initialize array BEFORE using it
+        ghosts = new Ghost[10];  // you can change size if needed
 
-        // Spawn first ghost safely
+        // safe first spawn
         Point p = getValidSpawn();
         ghosts[0] = new Ghost(p.x, p.y);
+        ghostCount = 1;
 
         timer = new Timer(40, this);
         timer.start();
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(500, 520);
+    }
+
     public void actionPerformed(ActionEvent e) {
 
-        // Movement control
         int dx = 0, dy = 0;
-
         if (up) dy = -1;
         if (down) dy = 1;
         if (left) dx = -1;
@@ -47,22 +52,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         pacman.setDirection(dx, dy);
         pacman.move(maze);
 
-        // Move ghosts
         for (int i = 0; i < ghostCount; i++) {
             ghosts[i].move(maze);
         }
 
-        // Spawn ghosts slowly (every few seconds)
         spawnTimer++;
 
-        if (spawnTimer > 500 && ghostCount < ghosts.length) {  // delay ~6 seconds
+        // spawn new ghost safely
+        if (spawnTimer > 300 && ghostCount < ghosts.length) {
             Point p = getValidSpawn();
             ghosts[ghostCount] = new Ghost(p.x, p.y);
             ghostCount++;
-            spawnTimer = 0; // reset timer
+            spawnTimer = 0;
         }
 
-        // Collision
+        // collision check
         for (int i = 0; i < ghostCount; i++) {
             if (pacman.getBounds().intersects(ghosts[i].getBounds())) {
                 JOptionPane.showMessageDialog(this, "Game Over!");
@@ -70,30 +74,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        // Win
         if (maze.isFinished()) {
             JOptionPane.showMessageDialog(this, "You Win!");
             System.exit(0);
         }
 
         repaint();
-    }
-
-    //  IMPORTANT: Find safe spawn location
-    private Point getValidSpawn() {
-        int tileSize = maze.tileSize;
-
-        while (true) {
-            int row = rand.nextInt(maze.map.length);
-            int col = rand.nextInt(maze.map[0].length);
-
-            // Spawn only on path (food or empty)
-            if (maze.map[row][col] != 1) {
-                int x = col * tileSize;
-                int y = row * tileSize;
-                return new Point(x, y);
-            }
-        }
     }
 
     protected void paintComponent(Graphics g) {
@@ -108,6 +94,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         g.setColor(Color.WHITE);
         g.drawString("Score: " + pacman.score, 20, 20);
+    }
+
+    private Point getValidSpawn() {
+        while (true) {
+            int row = rand.nextInt(maze.map.length);
+            int col = rand.nextInt(maze.map[0].length);
+
+            if (maze.map[row][col] == 0) {
+                int x = col * maze.tileSize;
+                int y = row * maze.tileSize;
+                return new Point(x, y);
+            }
+        }
     }
 
     public void keyPressed(KeyEvent e) {

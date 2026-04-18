@@ -6,67 +6,76 @@ public class Maze {
 
     int[][] map = {
             {1,1,1,1,1,1,1,1,1,1},
-            {1,2,2,2,2,2,2,2,2,1},
-            {1,2,1,1,2,1,1,2,2,1},
-            {1,2,2,2,2,2,1,2,2,1},
-            {1,2,1,2,1,2,2,2,2,1},
-            {1,2,2,2,1,2,1,1,2,1},
-            {1,1,1,2,2,2,2,2,2,1},
-            {1,2,2,2,1,1,2,1,2,1},
-            {1,2,2,2,2,2,2,2,2,1},
+            {1,0,0,0,0,0,0,0,0,1},
+            {1,0,1,1,0,1,1,0,0,1},
+            {1,0,0,0,0,0,1,0,0,1},
+            {1,0,1,0,1,0,0,0,0,1},
+            {1,0,1,0,1,0,1,1,0,1},
+            {1,0,0,0,0,0,0,0,0,1},
+            {1,1,0,1,1,0,1,0,1,1},
+            {1,0,0,0,0,0,0,0,0,1},
             {1,1,1,1,1,1,1,1,1,1}
     };
 
-    public void draw(Graphics g) {
-        for (int row = 0; row < map.length; row++) {
-            for (int col = 0; col < map[row].length; col++) {
+    boolean[][] food = new boolean[10][10];
 
-                if (map[row][col] == 1) {
-                    g.setColor(Color.BLUE);
-                    g.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
-                }
-
-                if (map[row][col] == 2) {
-                    g.setColor(Color.WHITE);
-                    g.fillOval(col * tileSize + tileSize/3,
-                            row * tileSize + tileSize/3,
-                            tileSize/4, tileSize/4);
+    public Maze() {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (map[i][j] == 0) {
+                    food[i][j] = true;
                 }
             }
         }
     }
 
-    public boolean isWall(int x, int y, int size) {
+    public void draw(Graphics g) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
 
-        int left = x / tileSize;
-        int right = (x + size - 1) / tileSize;
-        int top = y / tileSize;
-        int bottom = (y + size - 1) / tileSize;
+                if (map[i][j] == 1) {
+                    g.setColor(Color.BLUE);
+                    g.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
+                } else {
+                    g.setColor(Color.LIGHT_GRAY);
+                    g.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
 
-        if (top < 0 || left < 0 || bottom >= map.length || right >= map[0].length)
-            return true;
-
-        return map[top][left] == 1 ||
-                map[top][right] == 1 ||
-                map[bottom][left] == 1 ||
-                map[bottom][right] == 1;
+                    if (food[i][j]) {
+                        g.setColor(Color.WHITE);
+                        g.fillOval(j * tileSize + 20, i * tileSize + 20, 10, 10);
+                    }
+                }
+            }
+        }
     }
 
-    public boolean eatFood(int x, int y) {
+    public boolean isWall(int x, int y) {
+
         int col = x / tileSize;
         int row = y / tileSize;
 
-        if (map[row][col] == 2) {
-            map[row][col] = 0;
+        if (row < 0 || col < 0 || row >= map.length || col >= map[0].length) {
+            return true;
+        }
+
+        return map[row][col] == 1;
+    }
+
+    public boolean eatFood(int x, int y) {
+        int row = y / tileSize;
+        int col = x / tileSize;
+
+        if (food[row][col]) {
+            food[row][col] = false;
             return true;
         }
         return false;
     }
 
     public boolean isFinished() {
-        for (int[] row : map) {
-            for (int cell : row) {
-                if (cell == 2) return false;
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (food[i][j]) return false;
             }
         }
         return true;
