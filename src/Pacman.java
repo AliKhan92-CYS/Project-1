@@ -50,7 +50,7 @@ public class Pacman {
         g.fillOval(x + 20, y + 5, 5, 5);
     }
 
-    // ✅ NEW: direction-based mouth rotation
+    //  NEW: direction-based mouth rotation
     private int getMouthAngle() {
         if (dx == 1) return 30;    // right
         if (dx == -1) return 210;  // left

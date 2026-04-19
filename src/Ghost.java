@@ -34,7 +34,7 @@ public class Ghost {
         int newX = x + dx * speed;
         int newY = y + dy * speed;
 
-        // ✅ check if movement is valid
+        //  check if movement is valid
         boolean canMove =
                 !maze.isWall(newX, newY) &&
                         !maze.isWall(newX + size - 1, newY) &&
@@ -46,11 +46,11 @@ public class Ghost {
             y = newY;
             steps--;
         } else {
-            // 🔥 instead of instant random, try new direction
+            //  instead of instant random, try new direction
             setRandomDirection();
         }
 
-        // 🔥 only change direction when steps end (not every collision)
+        //  only change direction when steps end (not every collision)
         if (steps <= 0) {
             setRandomDirection();
         }
